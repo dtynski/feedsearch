@@ -47,8 +47,8 @@ def get_exceptions() -> bool:
 
     :return: Catch exception boolean
     """
-    return getattr(LOCAL_CONTEXT, "exceptions", False)
-
+#    return getattr(LOCAL_CONTEXT, "exceptions", False)
+    return False
 
 def set_exceptions(value: bool = False) -> None:
     """
@@ -74,6 +74,7 @@ def create_requests_session(
     max_redirects: int = 30,
     timeout: Union[float, Tuple[float, float]] = default_timeout,
     exceptions: bool = False,
+    verify=False
 ):
     """
     Creates a Requests Session and sets User-Agent header and Max Redirects
@@ -97,8 +98,8 @@ def create_requests_session(
     # Add request session to local context
     setattr(LOCAL_CONTEXT, "session", session)
     setattr(LOCAL_CONTEXT, "timeout", timeout)
-    setattr(LOCAL_CONTEXT, "exceptions", exceptions)
-
+    setattr(LOCAL_CONTEXT, "exceptions", False)
+    setattr(LOCAL_CONTEXT,"verify",False)
     yield session
 
     # Close request session
@@ -113,6 +114,7 @@ def requests_session(
     max_redirects: int = 30,
     timeout: Union[float, Tuple[float, float]] = default_timeout,
     exceptions: bool = False,
+    verify=False
 ):
     """
     Wraps a requests session around a function.
@@ -171,7 +173,7 @@ def get_url(
     start_time = time.perf_counter()
     try:
         session = get_session()
-        response = session.get(url, timeout=timeout, **kwargs)
+        response = session.get(url, timeout=timeout,verify=False, **kwargs)
         response.raise_for_status()
     except RequestException as ex:
         logger.warning("RequestException while getting URL: %s, %s", url, str(ex))
